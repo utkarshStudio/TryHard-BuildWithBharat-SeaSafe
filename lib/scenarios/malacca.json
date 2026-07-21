@@ -1,0 +1,94 @@
+{
+  "id": "malacca",
+  "label": "Singapore Strait Piracy",
+  "flavor": "Minor detour · severity 3",
+  "vessel": {
+    "id": "mv-tropical-sun",
+    "name": "MV Tropical Sun",
+    "imo": "9821447",
+    "type": "Container · 8,500 TEU",
+    "position": [121.47, 31.23],
+    "headingDeg": 230,
+    "cargoManifest": [
+      { "item": "Electronics (high-value)", "tons": 21000 },
+      { "item": "Industrial chemicals", "tons": 6800 }
+    ]
+  },
+  "voyage": {
+    "from": { "id": "cnsha", "name": "Shanghai", "country": "CN", "unlocode": "CNSHA", "position": [121.47, 31.23] },
+    "to":   { "id": "innsa", "name": "Mumbai (Nhava Sheva)", "country": "IN", "unlocode": "INNSA", "position": [72.83, 18.95] }
+  },
+  "routes": [
+    {
+      "id": "cn-bom-malacca",
+      "label": "Malacca / Singapore Strait route",
+      "isCurrent": true,
+      "waypoints": [[121.47,31.23],[115,15],[110,8],[108,4],[104,1],[100,3],[95,5],[85,7],[78,12],[72.83,18.95]],
+      "distanceNm": 4800,
+      "etaHours": 267
+    },
+    {
+      "id": "cn-bom-sunda",
+      "label": "Sunda Strait detour",
+      "isCurrent": false,
+      "waypoints": [[121.47,31.23],[115,10],[113,4],[110,0],[107,-3],[106,-6],[105.8,-6.0],[104,-8],[99,-5],[87,-1],[79,5],[75,12],[72.83,18.95]],
+      "distanceNm": 5150,
+      "etaHours": 286
+    },
+    {
+      "id": "cn-bom-lombok",
+      "label": "Lombok Strait (deep bypass)",
+      "isCurrent": false,
+      "waypoints": [[121.47,31.23],[115,10],[113,4],[112,-1],[115,-5],[115.7,-8.6],[116,-9.5],[110,-8],[95,-5],[80,2],[75,8],[72.83,18.95]],
+      "distanceNm": 5600,
+      "etaHours": 311
+    }
+  ],
+  "chokepoint": {
+    "id": "singapore_strait",
+    "name": "Singapore Strait (Malacca eastern approach)",
+    "position": [104, 1],
+    "polygon": [[103,0.5],[105,0.5],[105,1.8],[103,1.8]],
+    "severity": 3,
+    "status": "piracy_active",
+    "summary": "ReCAAP advisory: 5 boardings in past 14 days, 3 successful. Targeting bridge stores and crew valuables. Several incidents involving multiple armed perpetrators."
+  },
+  "advisory": {
+    "id": "risk-malacca",
+    "chokepointId": "singapore_strait",
+    "title": "Singapore Strait (Malacca eastern approach)",
+    "severity": 3,
+    "summary": "ReCAAP advisory: 5 boardings in past 14 days, 3 successful. Targeting bridge stores and crew valuables. Several incidents involving multiple armed perpetrators.",
+    "sources": [
+      { "title": "ReCAAP weekly incident report flags Singapore Strait surge", "url": "https://www.reuters.com/world/asia-pacific/", "domain": "reuters.com" },
+      { "title": "Carriers warn crews on Malacca/Singapore Strait approaches", "url": "https://lloydslist.com/", "domain": "lloydslist.com" },
+      { "title": "Boardings in Singapore Strait reach multi-year high", "url": "https://www.maritime-executive.com/", "domain": "maritime-executive.com" }
+    ]
+  },
+  "orchestratorScript": [
+    { "tool": "check_chokepoint_status", "args": { "chokepoint_id": "singapore_strait" }, "delayMsBefore": 700 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "cn-bom-malacca" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "cn-bom-sunda" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "cn-bom-lombok" }, "delayMsBefore": 900 },
+    { "tool": "compare_routes", "args": { "route_a_id": "cn-bom-malacca", "route_b_id": "cn-bom-sunda" }, "delayMsBefore": 700 },
+    { "tool": "compare_routes", "args": { "route_a_id": "cn-bom-malacca", "route_b_id": "cn-bom-lombok" }, "delayMsBefore": 700 },
+    { "tool": "check_port_congestion", "args": { "port_id": "inbom" }, "delayMsBefore": 700 }
+  ],
+  "portCongestion": {
+    "portId": "inbom",
+    "portName": "Jawaharlal Nehru Port (JNPT)",
+    "unlocode": "INBOM",
+    "berthOccupancyPct": 54,
+    "anchorQueueVessels": 2,
+    "estimatedWaitHours": 4,
+    "status": "clear",
+    "note": "JNPT Container Terminal 4 has open berth slots; no anchor queue expected on current ETA window."
+  },
+  "decision": {
+    "recommendedRouteId": "cn-bom-sunda",
+    "alternativeRouteIds": ["cn-bom-lombok", "cn-bom-malacca"],
+    "headline": "Detour via Sunda Strait",
+    "rationale": "Sunda adds only 19 h and $34K against a 60% boarding success rate — clear call for high-value electronics cargo. Lombok is the safe alternative if Sunda sees secondary piracy alerts; adds 44 h but guarantees avoidance. Malacca direct: unjustifiable given active ReCAAP advisory.",
+    "highlightDeltas": { "etaHours": 19, "fuelTons": 55, "fuelUsd": 34000, "co2Tons": 172 }
+  }
+}

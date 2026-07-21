@@ -1,0 +1,96 @@
+{
+  "id": "panama",
+  "label": "Panama Canal Drought",
+  "flavor": "Queue inversion · severity 2",
+  "vessel": {
+    "id": "mv-pacific-star",
+    "name": "MV Pacific Star",
+    "imo": "9822000",
+    "type": "Container · 5,500 TEU",
+    "position": [121.47, 31.23],
+    "headingDeg": 95,
+    "cargoManifest": [
+      { "item": "Consumer electronics", "tons": 22000 },
+      { "item": "Auto parts", "tons": 11800 },
+      { "item": "Retail goods", "tons": 9000 }
+    ]
+  },
+  "voyage": {
+    "from": { "id": "cnsha", "name": "Shanghai", "country": "CN", "unlocode": "CNSHA", "position": [121.47, 31.23] },
+    "to": { "id": "usnyc", "name": "New York", "country": "US", "unlocode": "USNYC", "position": [-74.01, 40.71] }
+  },
+  "routes": [
+    {
+      "id": "cn-nyc-panama",
+      "label": "Panama Canal route",
+      "isCurrent": true,
+      "waypoints": [[121.47,31.23],[140,25],[170,20],[-170,18],[-140,15],[-110,12],[-90,10],[-79.5,9],[-78,12],[-75,25],[-74.01,40.71]],
+      "distanceNm": 11000,
+      "etaHours": 827
+    },
+    {
+      "id": "cn-nyc-suez",
+      "label": "Suez Canal route",
+      "isCurrent": false,
+      "waypoints": [[121.47,31.23],[115,22],[105,8],[95,5],[80,8],[60,12],[45,12.5],[32.55,29.97],[25,35],[-5.5,36],[-15,41],[-30,46],[-50,44],[-66,42],[-74.01,40.71]],
+      "distanceNm": 12400,
+      "etaHours": 689
+    },
+    {
+      "id": "cn-nyc-cape-horn",
+      "label": "Cape Horn route",
+      "isCurrent": false,
+      "waypoints": [[121.47,31.23],[140,25],[160,5],[-170,-10],[-140,-25],[-110,-40],[-75,-55],[-60,-52],[-45,-35],[-35,-15],[-45,15],[-60,30],[-74.01,40.71]],
+      "distanceNm": 15200,
+      "etaHours": 844
+    }
+  ],
+  "chokepoint": {
+    "id": "panama_canal",
+    "name": "Panama Canal",
+    "position": [-79.5, 9.0],
+    "polygon": [[-80.5,8],[-78.5,8],[-78.5,10.5],[-80.5,10.5]],
+    "severity": 2,
+    "status": "restricted",
+    "summary": "Drought-induced transit restrictions. Daily transits cut from 36 to 22. Current queue ~9 days. Weight caps in effect.",
+    "transitDelayHours": 216
+  },
+  "advisory": {
+    "id": "risk-panama",
+    "chokepointId": "panama_canal",
+    "title": "Panama Canal",
+    "severity": 2,
+    "summary": "Drought restrictions have created a 9-day queue and draft constraints for container traffic. The longer Suez routing can arrive earlier once queue time is counted.",
+    "sources": [
+      { "title": "Panama Canal drought restrictions continue", "url": "https://www.reuters.com/world/americas/", "domain": "reuters.com" },
+      { "title": "Container lines evaluate Suez alternatives", "url": "https://lloydslist.com/", "domain": "lloydslist.com" },
+      { "title": "Draft limits and queue pressure at Panama", "url": "https://www.maritime-executive.com/", "domain": "maritime-executive.com" }
+    ]
+  },
+  "orchestratorScript": [
+    { "tool": "check_chokepoint_status", "args": { "chokepoint_id": "panama_canal" }, "delayMsBefore": 700 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "cn-nyc-panama" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "cn-nyc-suez" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "cn-nyc-cape-horn" }, "delayMsBefore": 900 },
+    { "tool": "compare_routes", "args": { "route_a_id": "cn-nyc-panama", "route_b_id": "cn-nyc-suez" }, "delayMsBefore": 700 },
+    { "tool": "compare_routes", "args": { "route_a_id": "cn-nyc-panama", "route_b_id": "cn-nyc-cape-horn" }, "delayMsBefore": 700 },
+    { "tool": "check_port_congestion", "args": { "port_id": "usnyc" }, "delayMsBefore": 700 }
+  ],
+  "portCongestion": {
+    "portId": "usnyc",
+    "portName": "Port of New York and New Jersey",
+    "unlocode": "USNYC",
+    "berthOccupancyPct": 79,
+    "anchorQueueVessels": 9,
+    "estimatedWaitHours": 18,
+    "status": "moderate",
+    "note": "Arrival timing shifts from Panama queue avoidance may compress berth windows at Port Newark and Elizabeth terminals."
+  },
+  "decision": {
+    "recommendedRouteId": "cn-nyc-suez",
+    "alternativeRouteIds": ["cn-nyc-cape-horn", "cn-nyc-panama"],
+    "headline": "Reroute via Suez · bypass Panama queue",
+    "rationale": "Panama drought has flipped the math. Suez arrives 5.75 days sooner than the queue-burdened Panama route and saves roughly $250K in fuel. Cape Horn avoids canal constraints but adds unnecessary distance for this vessel. Recommended: Suez.",
+    "highlightDeltas": { "etaHours": -138, "fuelTons": -403, "fuelUsd": -250000, "co2Tons": -1260 }
+  }
+}

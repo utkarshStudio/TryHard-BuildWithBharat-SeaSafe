@@ -1,0 +1,94 @@
+{
+  "id": "cyclone",
+  "label": "Arabian Sea Cyclone",
+  "flavor": "Extreme weather diversion · severity 5",
+  "vessel": {
+    "id": "mv-indira-wind",
+    "name": "MV Indira Wind",
+    "imo": "9912345",
+    "type": "General Cargo · 18,000 DWT",
+    "position": [72.88, 18.94],
+    "headingDeg": 195,
+    "cargoManifest": [
+      { "item": "Humanitarian aid (food rations)", "tons": 6400 },
+      { "item": "Medical supplies", "tons": 1800 }
+    ]
+  },
+  "voyage": {
+    "from": { "id": "inbom", "name": "Mumbai", "country": "IN", "unlocode": "INBOM", "position": [72.88, 18.94] },
+    "to":   { "id": "lkcmb", "name": "Colombo", "country": "LK", "unlocode": "LKCMB", "position": [79.84, 6.92] }
+  },
+  "routes": [
+    {
+      "id": "bom-cmb-direct",
+      "label": "Direct — Arabian Sea crossing",
+      "isCurrent": true,
+      "distanceNm": 820,
+      "etaHours": 46,
+      "waypoints": [[72.88,18.94],[73.3,16.2],[73.8,13.5],[75,10.8],[77.2,8.6],[79.84,6.92]]
+    },
+    {
+      "id": "bom-cmb-southern",
+      "label": "Southern bypass — clear of cyclone",
+      "isCurrent": false,
+      "distanceNm": 1280,
+      "etaHours": 71,
+      "waypoints": [[72.88,18.94],[76.2,17],[78.4,12.5],[78.6,7],[79.2,5.4],[79.84,6.92]]
+    },
+    {
+      "id": "bom-cmb-coastal",
+      "label": "Indian coast hug — partial exposure",
+      "isCurrent": false,
+      "distanceNm": 1140,
+      "etaHours": 64,
+      "waypoints": [[72.88,18.94],[73.7,17.2],[74.5,14],[75.4,11],[76.8,9.5],[78.4,8.4],[79.84,6.92]]
+    }
+  ],
+  "chokepoint": {
+    "id": "cyclone_hamoon",
+    "name": "Cyclone Hamoon · Arabian Sea",
+    "position": [70.5, 14.5],
+    "polygon": [[68,12],[73,12],[73,17],[68,17]],
+    "severity": 5,
+    "status": "extreme_weather",
+    "summary": "Category 3 cyclone, max sustained winds 105 kt, moving NNE at 14 kt. Cone of uncertainty covers central Arabian Sea. Seas 8–10 m in danger zone. Forecast track unstable — landfall probability elevated along Gujarat / South Konkan coast."
+  },
+  "advisory": {
+    "id": "adv-cyclone-hamoon",
+    "chokepointId": "cyclone_hamoon",
+    "title": "Cyclone Hamoon · Arabian Sea",
+    "severity": 5,
+    "summary": "Category 3 tropical cyclone on unstable northerly track. Direct route passes within 180 nm of forecast centre. IMD advisory: vessels should not enter sea areas within 250 nm of cyclone centre. Cargo manifest includes humanitarian aid.",
+    "sources": [
+      { "title": "IMD Cyclone Warning — Arabian Sea (Active)", "url": "https://mausam.imd.gov.in/", "domain": "imd.gov.in" },
+      { "title": "Cyclone forces cargo reroutes in Arabian Sea", "url": "https://www.maritime-executive.com/", "domain": "maritime-executive.com" },
+      { "title": "IMO circular on tropical cyclone evasion", "url": "https://www.imo.org/", "domain": "imo.org" }
+    ]
+  },
+  "orchestratorScript": [
+    { "tool": "check_chokepoint_status", "args": { "chokepoint_id": "cyclone_hamoon" }, "delayMsBefore": 700 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "bom-cmb-direct" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "bom-cmb-southern" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "bom-cmb-coastal" }, "delayMsBefore": 900 },
+    { "tool": "compare_routes", "args": { "route_a_id": "bom-cmb-direct", "route_b_id": "bom-cmb-southern" }, "delayMsBefore": 700 },
+    { "tool": "compare_routes", "args": { "route_a_id": "bom-cmb-direct", "route_b_id": "bom-cmb-coastal" }, "delayMsBefore": 700 },
+    { "tool": "check_port_congestion", "args": { "port_id": "lkcmb" }, "delayMsBefore": 700 }
+  ],
+  "portCongestion": {
+    "portId": "lkcmb",
+    "portName": "Colombo International Container Terminal",
+    "unlocode": "LKCMB",
+    "berthOccupancyPct": 43,
+    "anchorQueueVessels": 1,
+    "estimatedWaitHours": 3,
+    "status": "clear",
+    "note": "CICT has priority humanitarian berth available; port authority pre-notified for aid cargo. Minimal wait regardless of diversion route chosen."
+  },
+  "decision": {
+    "recommendedRouteId": "bom-cmb-southern",
+    "alternativeRouteIds": ["bom-cmb-coastal", "bom-cmb-direct"],
+    "headline": "Divert via southern bypass · clear of cyclone track",
+    "rationale": "Direct route enters IMD's 250 nm exclusion zone during forecast peak intensity. Cyclone track is unstable — any northward wobble would place the vessel inside the danger radius with no sea room. Southern bypass adds 19 h and $34K in fuel to deliver humanitarian cargo safely to Colombo. Coastal hug is faster than the southern bypass but remains tangentially exposed to swells and outer bands — acceptable only if southern berths are congested. Direct transit: not authorised under IMD advisory.",
+    "highlightDeltas": { "etaHours": 25, "fuelTons": 53, "fuelUsd": 32860, "co2Tons": 165 }
+  }
+}

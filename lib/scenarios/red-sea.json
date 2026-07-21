@@ -1,0 +1,95 @@
+{
+  "id": "red-sea",
+  "label": "Red Sea Missile Threat",
+  "flavor": "Major reroute · severity 4",
+  "vessel": {
+    "id": "mv-meridian",
+    "name": "MV Meridian",
+    "imo": "9811000",
+    "type": "Container · 10,000 TEU",
+    "position": [103.85, 1.29],
+    "headingDeg": 285,
+    "cargoManifest": [
+      { "item": "Electronics", "tons": 24000 },
+      { "item": "Pharmaceuticals", "tons": 3200 },
+      { "item": "Machine parts", "tons": 18500 }
+    ]
+  },
+  "voyage": {
+    "from": { "id": "sgsin", "name": "Singapore", "country": "SG", "unlocode": "SGSIN", "position": [103.85, 1.29] },
+    "to":   { "id": "nlrtm", "name": "Rotterdam", "country": "NL", "unlocode": "NLRTM", "position": [4.14, 51.95] }
+  },
+  "routes": [
+    {
+      "id": "sg-rtm-suez",
+      "label": "Suez Canal route",
+      "isCurrent": true,
+      "waypoints": [[103.85,1.29],[99.5,4.5],[80,6],[65,10],[45,12.5],[38,20],[32.5,30],[25,35],[-5.5,36],[-5,45],[2,50],[4.14,51.95]],
+      "distanceNm": 8440,
+      "etaHours": 624
+    },
+    {
+      "id": "sg-rtm-cape",
+      "label": "Cape of Good Hope route",
+      "isCurrent": false,
+      "waypoints": [[103.85,1.29],[99.5,4.5],[75,0],[55,-15],[20,-35],[18.5,-34],[14,-30],[10,-15],[5,0],[2,10],[-2,25],[-5,36],[-5,45],[2,50],[4.14,51.95]],
+      "distanceNm": 11780,
+      "etaHours": 888
+    },
+    {
+      "id": "sg-rtm-convoy",
+      "label": "Suez — Naval Convoy",
+      "isCurrent": false,
+      "waypoints": [[103.85,1.29],[99.5,4.5],[80,6],[65,10],[45,12.5],[43.1,11.5],[38,20],[32.5,30],[25,35],[-5.5,36],[-5,45],[2,50],[4.14,51.95]],
+      "distanceNm": 8440,
+      "etaHours": 744
+    }
+  ],
+  "chokepoint": {
+    "id": "bab_el_mandeb",
+    "name": "Bab-el-Mandeb Strait",
+    "position": [43.3, 12.6],
+    "polygon": [[42,11],[45.5,11],[45.5,15.5],[42,15.5]],
+    "severity": 4,
+    "status": "active_threat",
+    "summary": "Active missile threats to commercial shipping. War-risk premiums ~10x baseline. Multiple casualty reports last 72h."
+  },
+  "advisory": {
+    "id": "risk-red-sea",
+    "chokepointId": "bab_el_mandeb",
+    "title": "Bab-el-Mandeb Strait",
+    "severity": 4,
+    "summary": "Active missile threats to commercial shipping in Bab-el-Mandeb. Multiple casualty reports last 72h. War-risk premiums elevated.",
+    "sources": [
+      { "title": "Houthi attacks force shipping reroutes around Africa", "url": "https://www.reuters.com/world/middle-east/", "domain": "reuters.com" },
+      { "title": "Container lines maintain Cape diversions", "url": "https://lloydslist.com/", "domain": "lloydslist.com" },
+      { "title": "War-risk premiums spike for Red Sea transits", "url": "https://www.maritime-executive.com/", "domain": "maritime-executive.com" }
+    ]
+  },
+  "orchestratorScript": [
+    { "tool": "check_chokepoint_status", "args": { "chokepoint_id": "bab_el_mandeb" }, "delayMsBefore": 700 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "sg-rtm-suez" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "sg-rtm-cape" }, "delayMsBefore": 900 },
+    { "tool": "calculate_route_metrics", "args": { "route_id": "sg-rtm-convoy" }, "delayMsBefore": 900 },
+    { "tool": "compare_routes", "args": { "route_a_id": "sg-rtm-suez", "route_b_id": "sg-rtm-cape" }, "delayMsBefore": 700 },
+    { "tool": "compare_routes", "args": { "route_a_id": "sg-rtm-suez", "route_b_id": "sg-rtm-convoy" }, "delayMsBefore": 700 },
+    { "tool": "check_port_congestion", "args": { "port_id": "nlrtm" }, "delayMsBefore": 700 }
+  ],
+  "portCongestion": {
+    "portId": "nlrtm",
+    "portName": "Port of Rotterdam",
+    "unlocode": "NLRTM",
+    "berthOccupancyPct": 87,
+    "anchorQueueVessels": 14,
+    "estimatedWaitHours": 22,
+    "status": "congested",
+    "note": "Cape-diverted vessels from Red Sea crisis have inflated ECT Delta and Euromax terminal queues since early January."
+  },
+  "decision": {
+    "recommendedRouteId": "sg-rtm-cape",
+    "alternativeRouteIds": ["sg-rtm-convoy", "sg-rtm-suez"],
+    "headline": "Divert via Cape of Good Hope",
+    "rationale": "Convoy transit reduces but does not eliminate severity-4 exposure; war-risk premiums remain ~7× baseline even under escort. Cape route adds 11 days at an incremental fuel cost that is outweighed by the risk delta and insurance saving. Recommended: Cape. Alternatives: Convoy transit (lower cost, residual risk), Direct Suez (not recommended).",
+    "highlightDeltas": { "etaHours": 264, "fuelTons": 770, "fuelUsd": 477400, "co2Tons": 2399 }
+  }
+}
