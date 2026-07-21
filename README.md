@@ -11,7 +11,6 @@
   🌐 Live Demo
 </a>
 &nbsp;•&nbsp;
-
 <a href="https://github.com/utkarshStudio/TryHard-BuildWithBharat-SeaSafe" target="_blank">
   📂 GitHub Repository
 </a>
