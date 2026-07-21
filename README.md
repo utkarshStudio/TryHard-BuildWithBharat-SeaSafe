@@ -10,7 +10,6 @@
 <a href="https://cerulean-meringue-9c5cdc.netlify.app" target="_blank">
   🌐 Live Demo
 </a>
-
 &nbsp;•&nbsp;
 
 <a href="https://github.com/utkarshStudio/TryHard-BuildWithBharat-SeaSafe" target="_blank">
